@@ -26,6 +26,8 @@ void adjust(void)
 \n	 {adjust(); EM_newline(); continue;}
 ","	 {adjust(); return COMMA;}
 for  	 {adjust(); return FOR;}
+"/""*"(.|\n)*"*""/" {adjust(); return COMMENT;}
+[a-zA-Z][a-z0-9_]* {adjust(); return ID;}
 [0-9]+	 {adjust(); yylval.ival=atoi(yytext); return INT;}
 .	 {adjust(); EM_error(EM_tokPos,"illegal token");}
 
