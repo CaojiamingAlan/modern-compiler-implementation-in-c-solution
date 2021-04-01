@@ -66,7 +66,7 @@ void adjust(void)
 "var"  {adjust(); return VAR;}
 "type"  {adjust(); return TYPE;}
 
-"/""*"(.|\n)*"*""/" {adjust(); return COMMENT;}
+"/""*"(.|\n)*"*""/" {adjust(); continue;}
 [a-zA-Z][a-z0-9_]* {adjust(); return ID;}
 [0-9]+	 {adjust(); yylval.ival=atoi(yytext); return INT;}
 [a-zA-Z0-9]+ {adjust(); return STRING;}

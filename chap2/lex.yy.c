@@ -1054,7 +1054,7 @@ case 44:
 /* rule 44 can match eol */
 YY_RULE_SETUP
 #line 69 "tiger.lex"
-{adjust(); return COMMENT;}
+{adjust(); continue;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
