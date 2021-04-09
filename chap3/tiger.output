@@ -45,7 +45,7 @@ Grammar
    34     | args COMMA exp
 
    35 assign: /* empty */
-   36       | COMMA ID EQ exp assign
+   36       | COMMA ID EQ exp assigns
 
    37 assigns: /* empty */
    38        | ID EQ exp assign
@@ -152,9 +152,9 @@ exps (49)
 args (50)
     on left: 33 34, on right: 9 34
 assign (51)
-    on left: 35 36, on right: 36 38
+    on left: 35 36, on right: 38
 assigns (52)
-    on left: 37 38, on right: 10 11
+    on left: 37 38, on right: 10 11 36
 decs (53)
     on left: 39 40, on right: 18 39
 dec (54)
@@ -2424,7 +2424,7 @@ state 124
 
 state 125
 
-   36 assign: COMMA . ID EQ exp assign
+   36 assign: COMMA . ID EQ exp assigns
 
     ID  shift, and go to state 131
 
@@ -2536,7 +2536,7 @@ state 130
 
 state 131
 
-   36 assign: COMMA ID . EQ exp assign
+   36 assign: COMMA ID . EQ exp assigns
 
     EQ  shift, and go to state 136
 
@@ -2634,7 +2634,7 @@ state 135
 
 state 136
 
-   36 assign: COMMA ID EQ . exp assign
+   36 assign: COMMA ID EQ . exp assigns
 
     ID      shift, and go to state 1
     STRING  shift, and go to state 2
@@ -2743,9 +2743,9 @@ state 140
    28    | exp . AND exp
    29    | exp . OR exp
    30    | exp . PLUS exp
-   36 assign: COMMA ID EQ exp . assign
+   36 assign: COMMA ID EQ exp . assigns
 
-    COMMA   shift, and go to state 125
+    ID      shift, and go to state 63
     PLUS    shift, and go to state 44
     MINUS   shift, and go to state 45
     TIMES   shift, and go to state 46
@@ -2759,9 +2759,9 @@ state 140
     AND     shift, and go to state 54
     OR      shift, and go to state 55
 
-    $default  reduce using rule 35 (assign)
+    $default  reduce using rule 37 (assigns)
 
-    assign  go to state 142
+    assigns  go to state 142
 
 
 state 141
@@ -2792,7 +2792,7 @@ state 141
 
 state 142
 
-   36 assign: COMMA ID EQ exp assign .
+   36 assign: COMMA ID EQ exp assigns .
 
     $default  reduce using rule 36 (assign)
 

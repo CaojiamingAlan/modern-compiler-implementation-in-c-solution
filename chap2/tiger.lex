@@ -24,7 +24,7 @@ void adjust(void)
 %%
 " "	 {adjust(); continue;}
 \t	 {adjust(); continue;}
-\r?\n	 {adjust(); EM_newline(); continue;}
+\n	 {adjust(); EM_newline(); continue;}
 ","	 {adjust(); return COMMA;}
 ":"  {adjust(); return COLON;}
 ";"  {adjust(); return  SEMICOLON;}
@@ -66,10 +66,11 @@ void adjust(void)
 "var"  {adjust(); return VAR;}
 "type"  {adjust(); return TYPE;}
 
-"/""*"(.|\n)*"*""/" {adjust(); continue;}
-[a-zA-Z][a-z0-9_]* {adjust(); return ID;}
+"/*"([^*]|\*+[^*/])*\*+"/"  {adjust(); continue;}
+[a-zA-Z][a-zA-Z0-9_]* {adjust(); return ID;}
 [0-9]+	 {adjust(); yylval.ival=atoi(yytext); return INT;}
-[a-zA-Z0-9]+ {adjust(); return STRING;}
+"\""[^\"]*"\"" {adjust(); return STRING;}
+[\ \t\b\f\r]+ {adjust(); continue;}
 .	 {adjust(); EM_error(EM_tokPos,"illegal token");}
 
 

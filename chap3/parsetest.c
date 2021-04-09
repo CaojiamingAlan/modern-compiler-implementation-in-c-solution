@@ -1,6 +1,13 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "util.h"
 #include "errormsg.h"
+
+#ifdef YYDEBUG
+  yydebug = 1;
+#endif
+
+#define YYDEBUG 1
 
 extern int yyparse(void);
 

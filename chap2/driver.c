@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
    if (tok==0) break;
    switch(tok) {
    case ID: case STRING:
-     printf("%10s %4d %s\n",tokname(tok),EM_tokPos,yylval.sval);
+     printf("%10s %4d %s\n",tokname(tok),EM_tokPos,"(null)");
      break;
    case INT:
      printf("%10s %4d %d\n",tokname(tok),EM_tokPos,yylval.ival);
@@ -42,6 +42,7 @@ int main(int argc, char **argv) {
    default:
      printf("%10s %4d\n",tokname(tok),EM_tokPos);
    }
+   fflush(stdout);
  }
  return 0;
 }

@@ -32,12 +32,89 @@ void yyerror(char *s)
 
 %start program
 
+%right OF
+%nonassoc DO
+%nonassoc ELSE
+%nonassoc ASSIGN
+%left AND OR
+%nonassoc EQ NEQ LT GT LE GE
+%left PLUS MINUS
+%left TIMES DIVIDE
 %%
 
 program:	exp
 
-exp:   ID
+exp:  lvalue
+   |  NIL
+   |  INT
+   |  STRING
+   |  MINUS exp
+   |  LPAREN RPAREN
+   |  LPAREN exps RPAREN
+   |  ID LPAREN args RPAREN
+
+   |  ty LBRACE assigns RBRACE
+   |  ID LBRACE assigns RBRACE
+   |  ID LBRACK exp RBRACK OF exp
+   |  lvalue ASSIGN exp 
+   |  forloop
+   |  whileloop
+   |  selection
+   |  BREAK
+   |  LET decs IN exps END
+   |  exp MINUS exp
+	 |  exp DIVIDE exp
+	 |  exp TIMES exp 
+	 |  exp EQ exp
+	 |  exp NEQ exp
+	 |  exp GT exp 
+	 |  exp LT exp
+	 |  exp GE exp
+	 |  exp LE exp
+	 |  exp AND exp
+	 |  exp OR exp
+	 |  exp PLUS exp
+
+exps: exp 
+    | exps SEMICOLON exp
+
+args: exp
+    | args COMMA exp
+
+assign: /* epsilon */
+      | COMMA ID EQ exp assign
+
+assigns: /* epsilon */
+      | ID EQ exp assign
+
+decs: decs dec
+    | dec
+dec:  tydec
+   |  vardec
+   |  fundec
+
+tydec: TYPE ID EQ ty
+ty: ID
+  | LBRACE tyfields RBRACE
+  | ARRAY OF ID
+tyfields: tyfield
+        | tyfields COMMA tyfield 
+tyfield: ID COLON ID
 
 
+vardec: VAR ID ASSIGN exp
+      | VAR ID COLON ID ASSIGN exp
 
-	
+fundec: FUNCTION ID LPAREN tyfields RPAREN EQ exp
+      | FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp
+
+lvalue: ID
+      | lvalue DOT ID
+      | lvalue LBRACK exp RBRACK
+      | ID LBRACK exp RBRACK	
+
+forloop: FOR ID ASSIGN exp TO exp DO exp
+whileloop: WHILE exp DO exp
+selection:  IF exp THEN exp 
+        |   IF exp THEN exp ELSE exp
+
