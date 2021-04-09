@@ -1,0 +1,6 @@
+/* correct declarations */
+let 
+var rec1 := rectype1 {name="Kapoios", address="Kapou", id=02432, age=44}
+in
+1
+end
