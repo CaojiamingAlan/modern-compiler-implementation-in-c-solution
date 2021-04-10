@@ -63,7 +63,6 @@ exp:  lvalue                      {$$=A_VarExp(EM_tokPos, $1);}
    |  LPAREN RPAREN               {}
    |  LPAREN exps RPAREN          {$$=$2}
    |  ID LPAREN args RPAREN       {}
-
    |  ty LBRACE assigns RBRACE
    |  ID LBRACE assigns RBRACE
    |  ID LBRACK exp RBRACK OF exp 
@@ -110,13 +109,13 @@ ty: ID
   | ARRAY OF ID
 tyfields: tyfield
         | tyfields COMMA tyfield 
-tyfield: ID COLON ID
+tyfield: ID COLON ty
 
 
 vardec: VAR ID ASSIGN exp
       | VAR ID COLON ID ASSIGN exp
 
-fundec: FUNCTION ID LPAREN tyfields RPAREN EQ exp
+fundec: FUNCTION ID LPAREN tyfields RPAREN EQ exp           {$$=A_FunctionDec(EM_tokPos, A_fundecList function)}
       | FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp
 
 lvalue: ID                        {$$=A_SimpleVar(EM_tokPos,S_Symbol($1));}

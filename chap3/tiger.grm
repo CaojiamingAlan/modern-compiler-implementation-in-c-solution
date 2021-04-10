@@ -99,7 +99,7 @@ ty: ID
   | ARRAY OF ID
 tyfields: tyfield
         | tyfields COMMA tyfield 
-tyfield: ID COLON ID
+tyfield: ID COLON ty
 
 
 vardec: VAR ID ASSIGN exp

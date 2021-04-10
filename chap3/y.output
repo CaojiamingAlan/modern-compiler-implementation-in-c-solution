@@ -1,5 +1,5 @@
 State 1 conflicts: 2 shift/reduce
-State 103 conflicts: 13 shift/reduce
+State 104 conflicts: 13 shift/reduce
 
 
 Grammar
@@ -66,7 +66,7 @@ Grammar
    48 tyfields: tyfield
    49         | tyfields COMMA tyfield
 
-   50 tyfield: ID COLON ID
+   50 tyfield: ID COLON ty
 
    51 vardec: VAR ID ASSIGN exp
    52       | VAR ID COLON ID ASSIGN exp
@@ -162,7 +162,7 @@ dec (54)
 tydec (55)
     on left: 44, on right: 41
 ty (56)
-    on left: 45 46 47, on right: 10 44
+    on left: 45 46 47, on right: 10 44 50
 tyfields (57)
     on left: 48 49, on right: 46 49 53 54
 tyfield (58)
@@ -597,7 +597,7 @@ state 26
 
 state 27
 
-   50 tyfield: ID . COLON ID
+   50 tyfield: ID . COLON ty
 
     COLON  shift, and go to state 67
 
@@ -1295,9 +1295,13 @@ state 66
 
 state 67
 
-   50 tyfield: ID COLON . ID
+   50 tyfield: ID COLON . ty
 
-    ID  shift, and go to state 101
+    ID      shift, and go to state 101
+    LBRACE  shift, and go to state 5
+    ARRAY   shift, and go to state 7
+
+    ty  go to state 102
 
 
 state 68
@@ -1306,7 +1310,7 @@ state 68
 
     ID  shift, and go to state 27
 
-    tyfield  go to state 102
+    tyfield  go to state 103
 
 
 state 69
@@ -1342,7 +1346,7 @@ state 71
     BREAK   shift, and go to state 12
     NIL     shift, and go to state 13
 
-    exp        go to state 103
+    exp        go to state 104
     ty         go to state 16
     lvalue     go to state 17
     forloop    go to state 18
@@ -1368,7 +1372,7 @@ state 72
     BREAK   shift, and go to state 12
     NIL     shift, and go to state 13
 
-    exp        go to state 104
+    exp        go to state 105
     ty         go to state 16
     lvalue     go to state 17
     forloop    go to state 18
@@ -1394,7 +1398,7 @@ state 73
     BREAK   shift, and go to state 12
     NIL     shift, and go to state 13
 
-    exp        go to state 105
+    exp        go to state 106
     ty         go to state 16
     lvalue     go to state 17
     forloop    go to state 18
@@ -1407,7 +1411,7 @@ state 74
    53 fundec: FUNCTION ID . LPAREN tyfields RPAREN EQ exp
    54       | FUNCTION ID . LPAREN tyfields RPAREN COLON ID EQ exp
 
-    LPAREN  shift, and go to state 106
+    LPAREN  shift, and go to state 107
 
 
 state 75
@@ -1415,15 +1419,15 @@ state 75
    51 vardec: VAR ID . ASSIGN exp
    52       | VAR ID . COLON ID ASSIGN exp
 
-    COLON   shift, and go to state 107
-    ASSIGN  shift, and go to state 108
+    COLON   shift, and go to state 108
+    ASSIGN  shift, and go to state 109
 
 
 state 76
 
    44 tydec: TYPE ID . EQ ty
 
-    EQ  shift, and go to state 109
+    EQ  shift, and go to state 110
 
 
 state 77
@@ -1445,7 +1449,7 @@ state 77
     NIL     shift, and go to state 13
 
     exp        go to state 25
-    exps       go to state 110
+    exps       go to state 111
     ty         go to state 16
     lvalue     go to state 17
     forloop    go to state 18
@@ -1792,7 +1796,7 @@ state 91
 
    10 exp: ty LBRACE assigns . RBRACE
 
-    RBRACE  shift, and go to state 111
+    RBRACE  shift, and go to state 112
 
 
 state 92
@@ -1811,7 +1815,7 @@ state 92
    30    | exp . PLUS exp
    57 lvalue: lvalue LBRACK exp . RBRACK
 
-    RBRACK  shift, and go to state 112
+    RBRACK  shift, and go to state 113
     PLUS    shift, and go to state 44
     MINUS   shift, and go to state 45
     TIMES   shift, and go to state 46
@@ -1883,7 +1887,7 @@ state 95
     BREAK   shift, and go to state 12
     NIL     shift, and go to state 13
 
-    exp        go to state 113
+    exp        go to state 114
     ty         go to state 16
     lvalue     go to state 17
     forloop    go to state 18
@@ -1903,7 +1907,7 @@ state 97
    12 exp: ID LBRACK exp RBRACK . OF exp
    58 lvalue: ID LBRACK exp RBRACK .
 
-    OF  shift, and go to state 114
+    OF  shift, and go to state 115
 
     $default  reduce using rule 58 (lvalue)
 
@@ -1926,7 +1930,7 @@ state 98
     BREAK   shift, and go to state 12
     NIL     shift, and go to state 13
 
-    exp        go to state 115
+    exp        go to state 116
     ty         go to state 16
     lvalue     go to state 17
     forloop    go to state 18
@@ -1975,19 +1979,26 @@ state 100
 
 state 101
 
-   50 tyfield: ID COLON ID .
+   45 ty: ID .
+
+    $default  reduce using rule 45 (ty)
+
+
+state 102
+
+   50 tyfield: ID COLON ty .
 
     $default  reduce using rule 50 (tyfield)
 
 
-state 102
+state 103
 
    49 tyfields: tyfields COMMA tyfield .
 
     $default  reduce using rule 49 (tyfields)
 
 
-state 103
+state 104
 
    19 exp: exp . MINUS exp
    20    | exp . DIVIDE exp
@@ -2016,7 +2027,7 @@ state 103
     GE      shift, and go to state 53
     AND     shift, and go to state 54
     OR      shift, and go to state 55
-    ELSE    shift, and go to state 116
+    ELSE    shift, and go to state 117
 
     PLUS      [reduce using rule 61 (selection)]
     MINUS     [reduce using rule 61 (selection)]
@@ -2034,7 +2045,7 @@ state 103
     $default  reduce using rule 61 (selection)
 
 
-state 104
+state 105
 
    19 exp: exp . MINUS exp
    20    | exp . DIVIDE exp
@@ -2066,7 +2077,7 @@ state 104
     $default  reduce using rule 60 (whileloop)
 
 
-state 105
+state 106
 
    19 exp: exp . MINUS exp
    20    | exp . DIVIDE exp
@@ -2094,28 +2105,28 @@ state 105
     GE      shift, and go to state 53
     AND     shift, and go to state 54
     OR      shift, and go to state 55
-    TO      shift, and go to state 117
+    TO      shift, and go to state 118
 
 
-state 106
+state 107
 
    53 fundec: FUNCTION ID LPAREN . tyfields RPAREN EQ exp
    54       | FUNCTION ID LPAREN . tyfields RPAREN COLON ID EQ exp
 
     ID  shift, and go to state 27
 
-    tyfields  go to state 118
+    tyfields  go to state 119
     tyfield   go to state 29
 
 
-state 107
+state 108
 
    52 vardec: VAR ID COLON . ID ASSIGN exp
 
-    ID  shift, and go to state 119
+    ID  shift, and go to state 120
 
 
-state 108
+state 109
 
    51 vardec: VAR ID ASSIGN . exp
 
@@ -2133,7 +2144,7 @@ state 108
     BREAK   shift, and go to state 12
     NIL     shift, and go to state 13
 
-    exp        go to state 120
+    exp        go to state 121
     ty         go to state 16
     lvalue     go to state 17
     forloop    go to state 18
@@ -2141,18 +2152,18 @@ state 108
     selection  go to state 20
 
 
-state 109
+state 110
 
    44 tydec: TYPE ID EQ . ty
 
-    ID      shift, and go to state 121
+    ID      shift, and go to state 101
     LBRACE  shift, and go to state 5
     ARRAY   shift, and go to state 7
 
     ty  go to state 122
 
 
-state 110
+state 111
 
    18 exp: LET decs IN exps . END
    32 exps: exps . SEMICOLON exp
@@ -2161,21 +2172,21 @@ state 110
     END        shift, and go to state 123
 
 
-state 111
+state 112
 
    10 exp: ty LBRACE assigns RBRACE .
 
     $default  reduce using rule 10 (exp)
 
 
-state 112
+state 113
 
    57 lvalue: lvalue LBRACK exp RBRACK .
 
     $default  reduce using rule 57 (lvalue)
 
 
-state 113
+state 114
 
    19 exp: exp . MINUS exp
    20    | exp . DIVIDE exp
@@ -2207,7 +2218,7 @@ state 113
     $default  reduce using rule 34 (args)
 
 
-state 114
+state 115
 
    12 exp: ID LBRACK exp RBRACK OF . exp
 
@@ -2233,7 +2244,7 @@ state 114
     selection  go to state 20
 
 
-state 115
+state 116
 
    19 exp: exp . MINUS exp
    20    | exp . DIVIDE exp
@@ -2268,7 +2279,7 @@ state 115
     assign  go to state 126
 
 
-state 116
+state 117
 
    62 selection: IF exp THEN exp ELSE . exp
 
@@ -2294,7 +2305,7 @@ state 116
     selection  go to state 20
 
 
-state 117
+state 118
 
    59 forloop: FOR ID ASSIGN exp TO . exp DO exp
 
@@ -2320,7 +2331,7 @@ state 117
     selection  go to state 20
 
 
-state 118
+state 119
 
    49 tyfields: tyfields . COMMA tyfield
    53 fundec: FUNCTION ID LPAREN tyfields . RPAREN EQ exp
@@ -2330,14 +2341,14 @@ state 118
     RPAREN  shift, and go to state 129
 
 
-state 119
+state 120
 
    52 vardec: VAR ID COLON ID . ASSIGN exp
 
     ASSIGN  shift, and go to state 130
 
 
-state 120
+state 121
 
    19 exp: exp . MINUS exp
    20    | exp . DIVIDE exp
@@ -2367,13 +2378,6 @@ state 120
     OR      shift, and go to state 55
 
     $default  reduce using rule 51 (vardec)
-
-
-state 121
-
-   45 ty: ID .
-
-    $default  reduce using rule 45 (ty)
 
 
 state 122
