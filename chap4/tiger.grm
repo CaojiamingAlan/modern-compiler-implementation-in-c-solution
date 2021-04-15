@@ -20,24 +20,41 @@ void yyerror(char *s)
 	int pos;
 	int ival;
 	string sval;
+  A_oper op;
 	A_var var;
 	A_exp exp;
+  A_expList expList;
+  A_dec dec;
+  A_decList decList;
+  A_field field;
+  A_fieldList fields;
+  A_efield efield;
+  A_efieldList efields;
+  A_ty type;
 	/* et cetera */
 	}
-
-%token <sval> ID STRING
-%token <ival> INT
 
 %token 
   COMMA COLON SEMICOLON LPAREN RPAREN LBRACK RBRACK 
   LBRACE RBRACE DOT 
-  PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE
-  AND OR ASSIGN
+  ASSIGN
   ARRAY IF THEN ELSE WHILE FOR TO DO LET IN END OF 
   BREAK NIL
   FUNCTION VAR TYPE 
 
-%type <exp> exp program
+%token <sval> ID STRING 
+%token <ival> INT
+%token <op>   MINUS DIVIDE TIMES EQ NEQ GT LT GE LE AND OR PLUS
+
+%type <exp> exp program forloop whileloop selection
+%type <var> lvalue
+%type <expList> args exps
+%type <dec> dec fundec vardec tydec
+%type <decList> decs
+%type <field> tyfield
+%type <fields> tyfields
+%type <type> ty
+%type <efields> assign assigns
 /* et cetera */
 
 %start program
@@ -59,71 +76,71 @@ exp:  lvalue                      {$$=A_VarExp(EM_tokPos, $1);}
    |  NIL                         {$$=A_NilExp(EM_tokPos);}
    |  INT                         {$$=A_IntExp(EM_tokPos, 100);}
    |  STRING                      {$$=A_StringExp(EM_tokPos, $1);}
-   |  MINUS exp                   {$$=$2}
-   |  LPAREN RPAREN               {}
-   |  LPAREN exps RPAREN          {$$=$2}
-   |  ID LPAREN args RPAREN       {}
-   |  ty LBRACE assigns RBRACE
-   |  ID LBRACE assigns RBRACE
-   |  ID LBRACK exp RBRACK OF exp 
-   |  lvalue ASSIGN exp 
-   |  forloop
-   |  whileloop
-   |  selection
-   |  BREAK
-   |  LET decs IN exps END
-   |  exp MINUS exp
-	 |  exp DIVIDE exp
-	 |  exp TIMES exp 
-	 |  exp EQ exp
-	 |  exp NEQ exp
-	 |  exp GT exp 
-	 |  exp LT exp
-	 |  exp GE exp
-	 |  exp LE exp
-	 |  exp AND exp
-	 |  exp OR exp
-	 |  exp PLUS exp
+   |  LPAREN RPAREN               {$$=A_NilExp(EM_tokPos);}
+   |  LPAREN exps RPAREN          {$$=$2->head;}
+   |  ID LPAREN args RPAREN       {$$=A_CallExp(EM_tokPos, S_Symbol($1), $3);}
+   |  ID LBRACE assigns RBRACE    {$$=A_RecordExp(EM_tokPos, S_Symbol($1), $3);}
+   |  ID LBRACK exp RBRACK OF exp {$$=A_ArrayExp(EM_tokPos, S_Symbol($1), $3, $6);}
+   |  lvalue ASSIGN exp           {$$=A_AssignExp(EM_tokPos, $1, $3);}
+   |  forloop                     {$$=$1;}
+   |  whileloop                   {$$=$1;}
+   |  selection                   {$$=$1;}
+   |  BREAK                       {$$=A_BreakExp(EM_tokPos);}
+   |  LET decs IN exps END        {$$=A_LetExp(EM_tokPos,$2,A_SeqExp(EM_tokPos, $4));}
+   |  MINUS exp                   {$$=$2;}
+   |  exp MINUS exp               {$$=A_OpExp(EM_tokPos, MINUS, $1, $3);};
+	 |  exp DIVIDE exp	        		{$$=A_OpExp(EM_tokPos, DIVIDE, $1, $3);}
+	 |  exp TIMES exp         			{$$=A_OpExp(EM_tokPos, TIMES , $1, $3);}
+	 |  exp EQ exp		             	{$$=A_OpExp(EM_tokPos, EQ, $1, $3);}
+	 |  exp NEQ exp		             	{$$=A_OpExp(EM_tokPos, NEQ, $1, $3);}
+	 |  exp GT exp 		            	{$$=A_OpExp(EM_tokPos, GT , $1, $3);}
+	 |  exp LT exp	            		{$$=A_OpExp(EM_tokPos, LT, $1, $3);}
+	 |  exp GE exp	            		{$$=A_OpExp(EM_tokPos, GE, $1, $3);}
+	 |  exp LE exp	            		{$$=A_OpExp(EM_tokPos, LE, $1, $3);}
+	 |  exp AND exp	            		{$$=A_OpExp(EM_tokPos, AND, $1, $3);}
+	 |  exp OR exp	            		{$$=A_OpExp(EM_tokPos, OR, $1, $3);}
+	 |  exp PLUS exp	          		{$$=A_OpExp(EM_tokPos, PLUS, $1, $3);}
 
-exps: exp                 {$$=$1}
-    | exps SEMICOLON exp  {$$=$3}
+exps: exp                 {$$=A_ExpList($1, NULL);}
+    | exp SEMICOLON exps  {$$=A_ExpList($1, $3);}
 
-args: exp
-    | args COMMA exp
+args: exp                 {$$=A_ExpList($1, NULL);}
+    | exp COMMA args      {$$=A_ExpList($1, $3);}
 
-assign: /* epsilon */
-      | COMMA ID EQ exp assign
+assign: /* epsilon */           {$$=A_EfieldList(NULL, NULL);}
+      | COMMA ID EQ exp assign  {$$=$5->head?A_EfieldList(A_Efield(S_Symbol($2), $4), $5):A_EfieldList(A_Efield(S_Symbol($2), $4), NULL);}
 
-assigns: /* epsilon */
-      | ID EQ exp assign
+assigns: /* epsilon */          {$$=NULL;}
+      | ID EQ exp assign        {$$=A_EfieldList(A_Efield(S_Symbol($1), $3), $4);}
 
-decs: decs dec
-    | dec
-dec:  tydec
-   |  vardec
-   |  fundec
+decs: dec decs      {$$=A_DecList($1, $2);}
+    | dec           {$$=A_DecList($1, NULL);}
+dec:  tydec         {$$=$1;}
+   |  vardec        {$$=$1;}
+   |  fundec        {$$=$1;}
 
-tydec: TYPE ID EQ ty
-ty: ID
-  | LBRACE tyfields RBRACE
-  | ARRAY OF ID
-tyfields: tyfield
-        | tyfields COMMA tyfield 
-tyfield: ID COLON ty
+/* The abstract syntax here is so fxxking weild */
+tydec: TYPE ID EQ ty        {$$=A_TypeDec(EM_tokPos, A_NametyList(A_Namety(S_Symbol($2), $4), NULL));} 
+ty: ID                      {$$=A_NameTy(EM_tokPos, S_Symbol($1));}
+  | LBRACE tyfields RBRACE  {$$=A_RecordTy(EM_tokPos, $2);}
+  | ARRAY OF ID             {$$=A_ArrayTy(EM_tokPos, S_Symbol($3));}
+tyfields: tyfield                 {$$=A_FieldList($1, NULL);}
+        | tyfield COMMA tyfields  {$$=A_FieldList($1, $3);}
+tyfield: ID COLON ID              {$$=A_Field(EM_tokPos, S_Symbol($1), S_Symbol($3));}
 
 
-vardec: VAR ID ASSIGN exp
-      | VAR ID COLON ID ASSIGN exp
+vardec: VAR ID ASSIGN exp           {$$=A_VarDec(EM_tokPos, S_Symbol($2), NULL, $4);}
+      | VAR ID COLON ID ASSIGN exp  {$$=A_VarDec(EM_tokPos, S_Symbol($2), S_Symbol($4), $6);}
 
-fundec: FUNCTION ID LPAREN tyfields RPAREN EQ exp           {$$=A_FunctionDec(EM_tokPos, A_fundecList function)}
-      | FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp
+fundec: FUNCTION ID LPAREN tyfields RPAREN EQ exp           {$$=A_FunctionDec(EM_tokPos, A_FundecList(A_Fundec(EM_tokPos, S_Symbol($2), $4, S_Symbol("void"), $7) , NULL));}
+      | FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp  {$$=A_FunctionDec(EM_tokPos, A_FundecList(A_Fundec(EM_tokPos, S_Symbol($2), $4, S_Symbol($7), $9) , NULL));}
 
 lvalue: ID                        {$$=A_SimpleVar(EM_tokPos,S_Symbol($1));}
       | lvalue DOT ID             {$$=A_FieldVar(EM_tokPos, $1, S_Symbol($3));}
-      | lvalue LBRACK exp RBRACK  {$$=A_SubscriptVar(EM_tokPos, $1, $2);}
-      | ID LBRACK exp RBRACK	    {$$=A_SubscriptVar(EM_tokPos, A_VarExp(EM_tokPos,A_SimpleVar(EM_tokPos,S_Symbol($1))), $2);}
+      | lvalue LBRACK exp RBRACK  {$$=A_SubscriptVar(EM_tokPos, $1, $3);}
+      | ID LBRACK exp RBRACK	    {$$=A_SubscriptVar(EM_tokPos, A_SimpleVar(EM_tokPos,S_Symbol($1)), $3);}
 
-forloop: FOR ID ASSIGN exp TO exp DO exp  {$$=A_ForExp(EM_tokPos, S_symbol($2), $4, $6, $8);}
+forloop: FOR ID ASSIGN exp TO exp DO exp  {$$=A_ForExp(EM_tokPos, S_Symbol($2), $4, $6, $8);}
 whileloop: WHILE exp DO exp               {$$=A_WhileExp(EM_tokPos, $2, $4);}
 selection:  IF exp THEN exp               {$$=A_IfExp(EM_tokPos, $2, $4, NULL);}
         |   IF exp THEN exp ELSE exp      {$$=A_IfExp(EM_tokPos, $2, $4, $6);}
