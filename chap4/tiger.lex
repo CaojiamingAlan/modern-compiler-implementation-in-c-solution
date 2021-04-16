@@ -70,9 +70,9 @@ void adjust(void)
 "type"  {adjust(); return TYPE;}
 
 "/*"([^*]|\*+[^*/])*\*+"/"  {adjust(); continue;}
-[a-zA-Z][a-zA-Z0-9_]* {adjust(); return ID;}
+[a-zA-Z][a-zA-Z0-9_]* {adjust(); yylval.sval=strdup(yytext); return ID;}
 [0-9]+	 {adjust(); yylval.ival=atoi(yytext); return INT;}
-"\""[^\"]*"\"" {adjust(); return STRING;}
+"\""[^\"]*"\"" {adjust(); yylval.sval=strdup(yytext); return STRING;}
 [\ \t\b\f\r]+ {adjust(); continue;}
 .	 {adjust(); EM_error(EM_tokPos,"illegal token");}
 

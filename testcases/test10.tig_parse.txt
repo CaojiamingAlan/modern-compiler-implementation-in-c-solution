@@ -1,0 +1,9 @@
+   whileExp(
+    opExp(
+     ,
+     intExp(10),
+     intExp(5)),
+    opExp(
+     ,
+     intExp(5),
+     intExp(6)))

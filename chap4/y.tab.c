@@ -1591,12 +1591,12 @@ yyreduce:
 
   case 5:
 #line 77 "tiger.grm"
-    {(yyval.exp)=A_IntExp(EM_tokPos, 100);}
+    {(yyval.exp)=A_IntExp(EM_tokPos, yylval.ival);}
     break;
 
   case 6:
 #line 78 "tiger.grm"
-    {(yyval.exp)=A_StringExp(EM_tokPos, (yyvsp[(1) - (1)].sval));}
+    {(yyval.exp)=A_StringExp(EM_tokPos, yylval.sval);}
     break;
 
   case 7:
@@ -1656,7 +1656,7 @@ yyreduce:
 
   case 18:
 #line 90 "tiger.grm"
-    {(yyval.exp)=(yyvsp[(2) - (2)].exp);}
+    {(yyval.exp)=A_OpExp(EM_tokPos, MINUS, A_IntExp(EM_tokPos, 0), (yyvsp[(2) - (2)].exp));}
     break;
 
   case 19:
@@ -1831,7 +1831,7 @@ yyreduce:
 
   case 53:
 #line 135 "tiger.grm"
-    {(yyval.dec)=A_FunctionDec(EM_tokPos, A_FundecList(A_Fundec(EM_tokPos, S_Symbol((yyvsp[(2) - (7)].sval)), (yyvsp[(4) - (7)].fields), S_Symbol("void"), (yyvsp[(7) - (7)].exp)) , NULL));}
+    {(yyval.dec)=A_FunctionDec(EM_tokPos, A_FundecList(A_Fundec(EM_tokPos, S_Symbol((yyvsp[(2) - (7)].sval)), (yyvsp[(4) - (7)].fields), S_Symbol((yyvsp[(2) - (7)].sval)), (yyvsp[(7) - (7)].exp)) , NULL));}
     break;
 
   case 54:

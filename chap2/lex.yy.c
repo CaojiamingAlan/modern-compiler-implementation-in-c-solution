@@ -1029,7 +1029,7 @@ YY_RULE_SETUP
 case 45:
 YY_RULE_SETUP
 #line 70 "tiger.lex"
-{adjust(); return ID;}
+{adjust(); yylval.sval=strdup(yytext);return ID;}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
@@ -1040,7 +1040,7 @@ case 47:
 /* rule 47 can match eol */
 YY_RULE_SETUP
 #line 72 "tiger.lex"
-{adjust(); return STRING;}
+{adjust(); yylval.sval=strdup(yytext); return STRING;}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP

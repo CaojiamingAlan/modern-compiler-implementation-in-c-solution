@@ -1,0 +1,10 @@
+   whileExp(
+    opExp(
+     ,
+     intExp(10),
+     intExp(5)),
+    opExp(
+     ,
+     varExp(
+      simpleVar(i)),
+     intExp(1)))
