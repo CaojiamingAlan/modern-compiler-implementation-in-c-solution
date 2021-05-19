@@ -1,5 +1,5 @@
-parsetest: parse.o y.tab.o lex.yy.o errormsg.o util.o absyn.o symbol.o table.o prabsyn.o
-	cc -g parse.o y.tab.o lex.yy.o errormsg.o util.o absyn.o symbol.o table.o prabsyn.o -o parsetest
+parsetest: parse.o y.tab.o lex.yy.o errormsg.o util.o absyn.o symbol.o table.o prabsyn.o env.o types.o semant.o
+	cc -g parse.o y.tab.o lex.yy.o errormsg.o util.o absyn.o symbol.o table.o prabsyn.o env.o types.o semant.o -o parsetest
 
 parse.o: parse.c errormsg.h util.h prabsyn.h
 	cc -g -c parse.c
@@ -37,5 +37,14 @@ lex.yy.c: tiger.lex
 util.o: util.c util.h
 	cc -g -c util.c
 
+env.o: env.c
+	cc -g -c env.c
+
+types.o: types.c
+	cc -g -c types.c
+
+semant.o: semant.c
+	cc -g -c semant.c
+
 clean: 
-	rm -f parsetest util.o parsetest.o lex.yy.o errormsg.o y.tab.c y.tab.h y.tab.o absyn.o symbol.o table.o parse.o prabsyn.o
+	rm -f parsetest util.o parsetest.o lex.yy.o errormsg.o y.tab.c y.tab.h y.tab.o absyn.o symbol.o table.o parse.o prabsyn.o env.o types.o semant.o
