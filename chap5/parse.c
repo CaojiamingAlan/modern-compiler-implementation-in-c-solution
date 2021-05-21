@@ -11,6 +11,7 @@
 #include "errormsg.h"
 #include "parse.h"
 #include "prabsyn.h"
+#include "types.h"
 #include "semant.h"
 
 extern int yyparse(void);
