@@ -12,3 +12,6 @@ E_enventry E_FunEntry(Ty_tyList formals, Ty_ty result);
 
 S_table E_base_tenv(void);
 S_table E_base_venv(void);
+
+void printVenv(S_table);
+void printTenv(S_table);

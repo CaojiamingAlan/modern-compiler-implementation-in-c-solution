@@ -34,6 +34,7 @@ expty transVar(S_table venv, S_table tenv, A_var v) {
       else {
         EM_error(v->pos, "undefined varaible %s", S_name(v->u.simple));
       }
+      break;
     }
     case A_fieldVar: {
       //find the variable first
@@ -47,6 +48,7 @@ expty transVar(S_table venv, S_table tenv, A_var v) {
         }
       }
       EM_error(v->pos, "undefined field varaible %s", S_name(v->u.simple));
+      break;
     }
     case A_subscriptVar: {
       expty e = transVar(venv, tenv, v->u.subscript.var);
@@ -55,6 +57,7 @@ expty transVar(S_table venv, S_table tenv, A_var v) {
         return expTy(NULL, actual_ty(ty->u.array));
       }
       EM_error(v->pos, "undefined subscript varaible %s", S_name(v->u.simple));
+      break;
     }
   }
   assert(0);
@@ -64,6 +67,8 @@ expty transVar(S_table venv, S_table tenv, A_var v) {
 expty transExp(S_table venv, S_table tenv, A_exp a) {
   switch(a->kind) {
     case A_varExp: {
+      printf("before varexp:");
+      printVenv(venv);
       return transVar(venv, tenv, a->u.var);
     }
     case A_nilExp: {
@@ -90,33 +95,34 @@ expty transExp(S_table venv, S_table tenv, A_exp a) {
         if(right.ty->kind != Ty_int) EM_error(a->u.op.right->pos, "integer required");
         return expTy(NULL, Ty_Int());
       }
+      return expTy(NULL, Ty_Int());
     }
     case A_recordExp: {
       //check each field
       //todo
-      E_enventry x = S_look(venv, a->u.record.typ);
-      return expTy(NULL, x->u.var.ty);
+      Ty_ty x = S_look(tenv, a->u.record.typ);
+      return expTy(NULL, x);
     }
     case A_seqExp: {
       //iterate over each exp
       A_expList l = a->u.seq;
       while (l->tail) {
-        transExp(tenv, venv, l->head);
+        transExp(venv, tenv, l->head);
         l = l->tail;
       }
       //return the type of the last expression
-      return transExp(tenv, venv, l->head);
+      return transExp(venv, tenv, l->head);
     }
     case A_assignExp: {
       //add to env
       Ty_ty ty = transExp(venv, tenv, a->u.assign.exp).ty;
       if(a->u.assign.var->kind == A_simpleVar) {
-        S_enter(venv, a->u.assign.var->u.simple, ty);
+        //check
       } else if (a->u.assign.var->kind == A_subscriptVar) {
         //check the type of the array
         //todo
       } else {
-        S_enter(venv, a->u.assign.var->u.field.sym, ty);
+        //check
       }
 
       //assign exp does not have a value
@@ -176,6 +182,23 @@ expty transExp(S_table venv, S_table tenv, A_exp a) {
 
 //todo
 Ty_ty transTy(S_table tenv, A_ty a) {
+  switch (a->kind) {
+    case A_nameTy: {
+      return S_look(tenv, a->u.name);
+    }
+    case A_recordTy: {
+      A_fieldList l = a->u.record;
+      Ty_tyList tyl = NULL;
+      while(l && l->head){
+        tyl = Ty_TyList(S_look(tenv, l->head->name), tyl);
+        l = l->tail;
+      }
+      return Ty_Record(tyl);
+    }
+    case A_arrayTy: {
+      return Ty_Array(S_look(tenv, a->u.array));
+    }
+  }
   return NULL;
 }
 
@@ -193,11 +216,15 @@ void transDec(S_table venv, S_table tenv, A_dec d) {
     case A_varDec: {
       expty e = transExp(venv, tenv, d->u.var.init);
       S_enter(venv, d->u.var.var, E_VarEntry(e.ty));
+      printf("after vardec: \n");
+      printVenv(venv);
       return;
     }
     case A_typeDec: {
       //todo
       S_enter(tenv, d->u.type->head->name, transTy(tenv, d->u.type->head->ty));
+      printf("after typedec:");
+      printTenv(tenv);
       return;
     }
     case A_functionDec: {
