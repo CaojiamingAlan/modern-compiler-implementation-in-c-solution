@@ -249,12 +249,12 @@ expty transExp(S_table venv, S_table tenv, A_exp a) {
     }
     case A_arrayExp: {
       //should check the type of the init value
-      //todo
-      if(transExp(venv, tenv, a->u.array.init).ty != S_look(tenv, a->u.array.typ)){
+      if(actual_ty(transExp(venv, tenv, a->u.array.init).ty) != 
+          ((Ty_ty)actual_ty(S_look(tenv, a->u.array.typ))->u.array)){
         EM_error(a->pos, "Init value type wrong");
         exit(0);
       }
-      return expTy(NULL, Ty_Array(transExp(venv, tenv, a->u.array.init).ty));
+      return expTy(NULL, S_look(tenv, a->u.array.typ));
     }
   }
   //should never go here
@@ -271,6 +271,7 @@ Ty_ty transTy(S_table tenv, A_ty a) {
         EM_error(a->pos, "undefined type %s", S_name(a->u.name));
         exit(0);
       }
+      return(ty);
     }
     case A_recordTy: {
       A_fieldList l = a->u.record;
