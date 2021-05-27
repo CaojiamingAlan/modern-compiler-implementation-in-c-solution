@@ -1656,52 +1656,52 @@ yyreduce:
 
   case 18:
 #line 90 "tiger.grm"
-    {(yyval.exp)=A_OpExp(EM_tokPos, MINUS, A_IntExp(EM_tokPos, 0), (yyvsp[(2) - (2)].exp));}
+    {(yyval.exp)=A_OpExp(EM_tokPos, A_minusOp, A_IntExp(EM_tokPos, 0), (yyvsp[(2) - (2)].exp));}
     break;
 
   case 19:
 #line 91 "tiger.grm"
-    {(yyval.exp)=A_OpExp(EM_tokPos, MINUS, (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
+    {(yyval.exp)=A_OpExp(EM_tokPos, A_minusOp, (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
     break;
 
   case 20:
 #line 92 "tiger.grm"
-    {(yyval.exp)=A_OpExp(EM_tokPos, DIVIDE, (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
+    {(yyval.exp)=A_OpExp(EM_tokPos, A_divideOp, (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
     break;
 
   case 21:
 #line 93 "tiger.grm"
-    {(yyval.exp)=A_OpExp(EM_tokPos, TIMES , (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
+    {(yyval.exp)=A_OpExp(EM_tokPos, A_timesOp , (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
     break;
 
   case 22:
 #line 94 "tiger.grm"
-    {(yyval.exp)=A_OpExp(EM_tokPos, EQ, (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
+    {(yyval.exp)=A_OpExp(EM_tokPos, A_eqOp, (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
     break;
 
   case 23:
 #line 95 "tiger.grm"
-    {(yyval.exp)=A_OpExp(EM_tokPos, NEQ, (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
+    {(yyval.exp)=A_OpExp(EM_tokPos, A_neqOp, (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
     break;
 
   case 24:
 #line 96 "tiger.grm"
-    {(yyval.exp)=A_OpExp(EM_tokPos, GT , (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
+    {(yyval.exp)=A_OpExp(EM_tokPos, A_gtOp, (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
     break;
 
   case 25:
 #line 97 "tiger.grm"
-    {(yyval.exp)=A_OpExp(EM_tokPos, LT, (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
+    {(yyval.exp)=A_OpExp(EM_tokPos, A_ltOp, (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
     break;
 
   case 26:
 #line 98 "tiger.grm"
-    {(yyval.exp)=A_OpExp(EM_tokPos, GE, (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
+    {(yyval.exp)=A_OpExp(EM_tokPos, A_geOp, (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
     break;
 
   case 27:
 #line 99 "tiger.grm"
-    {(yyval.exp)=A_OpExp(EM_tokPos, LE, (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
+    {(yyval.exp)=A_OpExp(EM_tokPos, A_leOp, (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
     break;
 
   case 28:
@@ -1716,7 +1716,7 @@ yyreduce:
 
   case 30:
 #line 102 "tiger.grm"
-    {(yyval.exp)=A_OpExp(EM_tokPos, PLUS, (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
+    {(yyval.exp)=A_OpExp(EM_tokPos, A_plusOp, (yyvsp[(1) - (3)].exp), (yyvsp[(3) - (3)].exp));}
     break;
 
   case 31:
@@ -1831,7 +1831,7 @@ yyreduce:
 
   case 53:
 #line 135 "tiger.grm"
-    {(yyval.dec)=A_FunctionDec(EM_tokPos, A_FundecList(A_Fundec(EM_tokPos, S_Symbol((yyvsp[(2) - (7)].sval)), (yyvsp[(4) - (7)].fields), S_Symbol((yyvsp[(2) - (7)].sval)), (yyvsp[(7) - (7)].exp)) , NULL));}
+    {(yyval.dec)=A_FunctionDec(EM_tokPos, A_FundecList(A_Fundec(EM_tokPos, S_Symbol((yyvsp[(2) - (7)].sval)), (yyvsp[(4) - (7)].fields), NULL, (yyvsp[(7) - (7)].exp)) , NULL));}
     break;
 
   case 54:
