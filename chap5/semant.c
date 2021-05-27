@@ -126,9 +126,9 @@ expty transExp(S_table venv, S_table tenv, A_exp a) {
           EM_error(a->pos, "func %s has less parameters than used", S_name(a->u.call.func));
           exit(0);
         }
-        if(transExp(venv, tenv, l->head).ty->kind != tyl->head->kind){
-          Ty_print(transExp(venv, tenv, l->head).ty);
-          Ty_print(tyl->head);
+        if(transExp(venv, tenv, l->head).ty != tyl->head){
+          //Ty_print(transExp(venv, tenv, l->head).ty);
+          //Ty_print(tyl->head);
           EM_error(a->pos, "arg type imcompatible in %s", S_name(a->u.call.func));
           exit(0);
         }
@@ -151,7 +151,7 @@ expty transExp(S_table venv, S_table tenv, A_exp a) {
         return expTy(NULL, Ty_Int());
       }
       else {
-        if(left.ty->kind != right.ty->kind) EM_error(a->u.op.left->pos, "comparison of incompatible types");
+        if(left.ty != right.ty) EM_error(a->u.op.left->pos, "comparison of incompatible types");
         return expTy(NULL, Ty_Int());
       }
       return expTy(NULL, Ty_Int());
@@ -160,6 +160,9 @@ expty transExp(S_table venv, S_table tenv, A_exp a) {
       //check each field
       //todo
       Ty_ty x = S_look(tenv, a->u.record.typ);
+      if(!x) {
+        EM_error(a->pos, "Cannot find record type %s", S_name(a->u.record.typ));
+      }
       return expTy(NULL, x);
     }
     case A_seqExp: {
@@ -189,7 +192,7 @@ expty transExp(S_table venv, S_table tenv, A_exp a) {
       expty then_e = transExp(venv, tenv, a->u.iff.then);
       if(a->u.iff.elsee){ 
         expty else_e =transExp(venv, tenv, a->u.iff.elsee);
-        if(else_e.ty->kind != then_e.ty->kind){
+        if(else_e.ty != then_e.ty){
           EM_error(a->pos, "types of then - else differ");
           exit(0);
         }
@@ -247,6 +250,10 @@ expty transExp(S_table venv, S_table tenv, A_exp a) {
     case A_arrayExp: {
       //should check the type of the init value
       //todo
+      if(transExp(venv, tenv, a->u.array.init).ty != S_look(tenv, a->u.array.typ)){
+        EM_error(a->pos, "Init value type wrong");
+        exit(0);
+      }
       return expTy(NULL, Ty_Array(transExp(venv, tenv, a->u.array.init).ty));
     }
   }
@@ -324,6 +331,16 @@ void transDec(S_table venv, S_table tenv, A_dec d) {
           exit(0);
         }
       }
+      if(e.ty == Ty_Nil()){
+        EM_error(d->pos, "Initializing nil expressions not constrained by record type");
+        exit(0);
+      }
+
+      E_enventry v = S_look(venv, d->u.var.var);
+      if(v && v->u.var.ty != e.ty){
+        EM_error(d->pos, "Variable assigned different types");
+      }
+
       S_enter(venv, d->u.var.var, E_VarEntry(e.ty));
       //printf("after vardec: \n");
       //printVenv(venv);
@@ -331,6 +348,11 @@ void transDec(S_table venv, S_table tenv, A_dec d) {
     }
     case A_typeDec: {
       //todo
+      Ty_ty ty = S_look(tenv, d->u.type->head->name);
+      if(ty){
+        EM_error(d->pos, "Type already assigned");
+      }
+
       S_enter(tenv, d->u.type->head->name, transTy(tenv, d->u.type->head->ty));
       // printf("after typedec:");
       // printTenv(tenv);
@@ -338,6 +360,13 @@ void transDec(S_table venv, S_table tenv, A_dec d) {
     }
     case A_functionDec: {
       A_fundec f = d->u.function->head;
+
+      E_enventry v = S_look(venv, f->name);
+      if(v){
+        EM_error(d->pos, "Function already defined");
+      }
+
+
       Ty_ty resultTy = f->result?S_look(tenv, f->result):Ty_Nil();
       Ty_tyList formalTys = makeFormalTyList(tenv, f->params);
       S_enter(venv, f->name, E_FunEntry(formalTys, resultTy));
@@ -350,7 +379,7 @@ void transDec(S_table venv, S_table tenv, A_dec d) {
       }
       // printf("after funcdec:");
       // printVenv(venv);
-      if(transExp(venv, tenv, f->body).ty->kind != resultTy->kind) {
+      if(transExp(venv, tenv, f->body).ty != resultTy) {
         EM_error(d->pos, "procedure return type different from declared", S_name(d->u.function->head->name));
       }
       S_endScope(venv);
